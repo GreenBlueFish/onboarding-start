@@ -10,6 +10,7 @@ You can also include images in this folder and reference them in the markdown. E
 ## How it works
 
 Explain how your project works
+I'm still trying to figure this out myself. I think I understand how the verilog code works. I'm a little lost with everything else
 
 ## How to test
 
