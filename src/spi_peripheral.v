@@ -27,11 +27,14 @@ reg sync_out;
 //reg ff1_out;
 reg past_cross_domain_wire_out;
 
-Two_FF_Synchronizer tff (
-    .clk(SCLK),
-    .async_in(cross_domain_wire),
-    .sync_out(sync_out)
-);
+// two ff sychronizer ff
+reg ff1;
+reg ff2;
+always @(posedge SCLK) begin
+    ff1 <= cross_domain_wire;
+    ff2 <= ff1;
+end
+assign sync_out = ff2;
 
 //SPI is in mode 0
 //CPOL = 0 -> idle state low
