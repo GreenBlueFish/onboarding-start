@@ -76,6 +76,7 @@ always @(posedge clk or negedge rst_n) begin
     if(!rst_n) begin
         counter <= 4'b0000;
         buffer <= 16'h00;
+        cross_domain_wire <= 1'b0;
 
         en_reg_out_7_0 <= {8{1'b0}};
         en_reg_out_15_8 <= {8{1'b0}};
