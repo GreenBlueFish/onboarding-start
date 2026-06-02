@@ -56,7 +56,7 @@ always @(posedge SCLK or negedge rst_n) begin
         temp_pwm_duty_cycle <= 8'h0;
 
         counter <= 4'b0000;
-        buffer <= 12'h0;
+        buffer <= 13'h0;
     end
 
     //If the chip select is on and the rst_n is off
