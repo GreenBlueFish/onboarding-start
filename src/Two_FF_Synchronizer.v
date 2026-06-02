@@ -2,7 +2,6 @@
 
 module Two_FF_Synchronizer(  
     input wire clk,
-    input wire rst_n,
     input wire async_in,
     output wire sync_out
 );
@@ -10,10 +9,7 @@ module Two_FF_Synchronizer(
 reg ff1;
 reg ff2;
 
-always @(posedge clk or negedge rst_n) begin
-    if(!rst_n) begin
-        ff1 <= 1'b0;
-        ff2 <= 1'b0;
+always @(posedge clk) begin
     end else begin
         ff1 <= async_in;
         ff2 <= ff1;

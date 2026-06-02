@@ -29,7 +29,6 @@ reg past_cross_domain_wire_out;
 
 Two_FF_Synchronizer tff (
     .clk(SCLK),
-    .rst_n(rst_n),
     .async_in(cross_domain_wire),
     .sync_out(sync_out)
 );
