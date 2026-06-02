@@ -38,7 +38,7 @@ Two_FF_Synchronizer tff (
 //CPOL = 0 -> idle state low
 //CPHA = 0 -> sample on first edge
 //Rising edge data sample
-reg [14:0] buffer;
+reg [12:0] buffer;
 reg [3:0] counter;
 
 reg [7:0] temp_en_reg_out_7_0;
@@ -56,12 +56,12 @@ always @(posedge SCLK or negedge rst_n) begin
         temp_pwm_duty_cycle <= 8'h0;
 
         counter <= 4'b0000;
-        buffer <= 16'h0;
+        buffer <= 12'h0;
     end
 
     //If the chip select is on and the rst_n is off
     else if((!CS) && (rst_n)) begin
-        buffer <= {buffer[13:0], sync_out};
+        buffer <= {buffer[12:0], sync_out};
         counter <= counter + 1;
         
         if(counter == 4'b1111) begin
