@@ -60,7 +60,7 @@ always @(posedge SCLK or negedge rst_n) begin
     end
 
     //If the chip select is on and the rst_n is off
-    if((!CS) && (rst_n)) begin
+    else if((!CS) && (rst_n)) begin
         buffer <= {buffer[14:0], sync_out};
         counter <= counter + 1;
         
@@ -73,8 +73,9 @@ always @(posedge SCLK or negedge rst_n) begin
                     7'h02: temp_en_reg_pwm_7_0 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
                     7'h03: temp_en_reg_pwm_15_8 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
                     7'h04: temp_pwm_duty_cycle <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
+                    default: ;
                 endcase
-            end
+            end else ;
             counter <= 4'b0;
         end
     end
