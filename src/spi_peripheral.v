@@ -28,6 +28,7 @@ reg ff1_out;
 
 Two_FF_Synchronizer #(.width(1)) tff (
     .clk(SCLK),
+    .rst_n(rst_n),
     .async_in(cross_domain_wire),
     .ff1(ff1_out),
     .sync_out(sync_out)
