@@ -3,16 +3,10 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import Timer
-from cocotb.triggers import RisingEdge, FallingEdge, ValueChange
+from cocotb.triggers import RisingEdge
 from cocotb.triggers import ClockCycles
-from cocotb.types import Logic
 from cocotb.types import LogicArray
 from cocotb.utils import get_sim_time
-
-# Rowan's code below
-# async def await_half_sclk(dut):
-#    await Timer(50, unit="ns") #half of 100ns period
 
 async def await_half_sclk(dut):
     """Wait for the SCLK signal to go high or low."""
