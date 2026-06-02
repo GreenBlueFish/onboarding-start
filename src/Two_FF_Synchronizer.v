@@ -10,10 +10,8 @@ reg ff1;
 reg ff2;
 
 always @(posedge clk) begin
-    end else begin
-        ff1 <= async_in;
-        ff2 <= ff1;
-    end
+    ff1 <= async_in;
+    ff2 <= ff1;
 end
 
 assign sync_out = ff2;
