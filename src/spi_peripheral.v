@@ -27,13 +27,9 @@ reg sync_out;
 //reg ff1_out;
 reg past_cross_domain_wire_out;
 
-// two ff sychronizer ff
+// two ff sychronizer ff code inside always @(posedge SCLK) block
 reg ff1;
 reg ff2;
-always @(posedge SCLK) begin
-    ff1 <= cross_domain_wire;
-    ff2 <= ff1;
-end
 assign sync_out = ff2;
 
 //SPI is in mode 0
@@ -63,6 +59,9 @@ always @(posedge SCLK or negedge rst_n) begin
 
     //If the chip select is on and the rst_n is off
     else if((!CS) && (rst_n)) begin
+        ff1 <= cross_domain_wire;
+        ff2 <= ff1;
+
         buffer <= {buffer[11:0], sync_out};
         past_cross_domain_wire_out <= cross_domain_wire;
         counter <= counter + 1;
@@ -86,6 +85,9 @@ always @(posedge SCLK or negedge rst_n) begin
      //If CS is 1 or High Z
      if (CS) begin
         counter <= 4'b0000;
+
+        ff1 <= cross_domain_wire;
+        ff2 <= ff1;
     end
 end
 
