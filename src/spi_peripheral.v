@@ -61,7 +61,7 @@ always @(posedge SCLK or negedge rst_n) begin
 
     //If the chip select is on and the rst_n is off
     else if((!CS) && (rst_n)) begin
-        buffer <= {buffer[12:0], sync_out};
+        buffer <= {buffer[11:0], sync_out};
         counter <= counter + 1;
         
         if(counter == 4'b1111) begin
