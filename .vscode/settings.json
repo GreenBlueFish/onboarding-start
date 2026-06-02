@@ -1,4 +1,21 @@
 {
   "verilog.linting.linter": "verilator",
-  "verilog.formatting.verilogHDL.formatter": "verible-verilog-format"
+  "verilog.formatting.verilogHDL.formatter": "verible-verilog-format",
+
+  "terminal.integrated.env.windows": {
+    "MSYS2_ENV_FILE": "${workspaceFolder}/.env.msys2"
+  },
+
+  "terminal.integrated.profiles.windows": {
+    "MSYS2 UCRT64": {
+      "path": "C:\\msys64\\ucrt64.exe",
+      "args": [ "--login", "-i" ],
+      "env": {
+        "MSYS2_ENV_FILE": "${workspaceFolder}/.env.msys2"
+      }
+    }
+  },
+
+  "terminal.integrated.defaultProfile.windows": "MSYS2 UCRT64"
 }
+
