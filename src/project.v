@@ -35,7 +35,6 @@ module tt_um_uwasic_onboarding_Rowan_Leonard (
     .CS(ui_in[2]),
     .SCLK(ui_in[0]),
     .COPI(ui_in[1]),
-    .CIPO(),
 
     .en_reg_out_7_0(en_reg_out_7_0),
     .en_reg_out_15_8(en_reg_out_15_8),

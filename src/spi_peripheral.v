@@ -69,9 +69,6 @@ always @(posedge SCLK) begin
 end
 
 always @(posedge clk or negedge rst_n) begin
-    //First ff set in clock domain crossing
-    cross_domain_wire <= COPI;
-    
     //Reset mechanism
     if(!rst_n) begin
         counter <= 4'b0000;
@@ -83,6 +80,10 @@ always @(posedge clk or negedge rst_n) begin
         en_reg_pwm_7_0 <= {8{1'b0}};
         en_reg_pwm_15_8 <= {8{1'b0}};
         pwm_duty_cycle <= {8{1'b0}};
+    end
+    else begin
+        //First ff set in clock domain crossing
+        cross_domain_wire <= COPI;
     end
 end
 
