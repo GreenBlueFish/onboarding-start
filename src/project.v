@@ -28,7 +28,7 @@ module tt_um_uwasic_onboarding_Rowan_Leonard (
   wire [7:0] en_reg_pwm_15_8;
   wire [7:0] pwm_duty_cycle;
 
-  wire unused_CIPO
+  wire unused_CIPO;
   spi_peripheral spi_peripheral_inst (
     .rst_n(rst_n),
     .clk(clk),
