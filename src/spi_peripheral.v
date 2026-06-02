@@ -24,13 +24,13 @@ reg cross_domain_wire;
 
 //tffs output
 reg sync_out;
-reg ff1_out;
+//reg ff1_out;
+reg past_cross_domain_wire_out;
 
 Two_FF_Synchronizer tff (
     .clk(SCLK),
     .rst_n(rst_n),
     .async_in(cross_domain_wire),
-    .ff1(ff1_out),
     .sync_out(sync_out)
 );
 
@@ -62,17 +62,18 @@ always @(posedge SCLK or negedge rst_n) begin
     //If the chip select is on and the rst_n is off
     else if((!CS) && (rst_n)) begin
         buffer <= {buffer[11:0], sync_out};
+        past_cross_domain_wire_out <= cross_domain_wire;
         counter <= counter + 1;
         
         if(counter == 4'b1111) begin
             //Checking if it is a write packet
             if(buffer[12] == 1'b1) begin
                 case(buffer[11:5])
-                    7'h00: temp_en_reg_out_7_0 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
-                    7'h01: temp_en_reg_out_15_8 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
-                    7'h02: temp_en_reg_pwm_7_0 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
-                    7'h03: temp_en_reg_pwm_15_8 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
-                    7'h04: temp_pwm_duty_cycle <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
+                    7'h00: temp_en_reg_out_7_0 <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
+                    7'h01: temp_en_reg_out_15_8 <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
+                    7'h02: temp_en_reg_pwm_7_0 <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
+                    7'h03: temp_en_reg_pwm_15_8 <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
+                    7'h04: temp_pwm_duty_cycle <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
                     default: ;
                 endcase
             end else ;
