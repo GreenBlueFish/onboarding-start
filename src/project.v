@@ -28,6 +28,7 @@ module tt_um_uwasic_onboarding_Rowan_Leonard (
   wire [7:0] en_reg_pwm_15_8;
   wire [7:0] pwm_duty_cycle;
 
+  wire unused_CIPO
   spi_peripheral spi_peripheral_inst (
     .rst_n(rst_n),
     .clk(clk),
@@ -35,6 +36,7 @@ module tt_um_uwasic_onboarding_Rowan_Leonard (
     .CS(ui_in[2]),
     .SCLK(ui_in[0]),
     .COPI(ui_in[1]),
+    .CIPO(unused_CIPO),
 
     .en_reg_out_7_0(en_reg_out_7_0),
     .en_reg_out_15_8(en_reg_out_15_8),
@@ -56,6 +58,6 @@ module tt_um_uwasic_onboarding_Rowan_Leonard (
   );
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, ui_in[7:3], uio_in, 1'b0};
+  wire _unused = &{ena, ui_in[7:3], uio_in, 1'b0, unused_CIPO};
 
 endmodule
