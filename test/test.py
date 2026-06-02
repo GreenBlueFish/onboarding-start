@@ -10,11 +10,11 @@ from cocotb.utils import get_sim_time
 
 async def await_half_sclk(dut):
     """Wait for the SCLK signal to go high or low."""
-    start_time = cocotb.utils.get_sim_time(unit="ns")
+    start_time = cocotb.utils.get_sim_time(units="ns")
     while True:
         await ClockCycles(dut.clk, 1)
         # Wait for half of the SCLK period (10 us)
-        if (start_time + 100*100*0.5) < cocotb.utils.get_sim_time(unit="ns"):
+        if (start_time + 100*100*0.5) < cocotb.utils.get_sim_time(units="ns"):
             break
     return
 
@@ -85,29 +85,29 @@ async def send_spi_transaction(dut, r_w, address, data):
 
 async def pwm_signal_info(dut):
     # Wait for bit 0 to go low first, so we start from a known state
-    initial_time = get_sim_time(unit="ns")
+    initial_time = get_sim_time(units="ns")
     while dut.uo_out.value == 1:
         await RisingEdge(dut.clk)  
-        if(get_sim_time(unit="ns") >= float(initial_time + 1000000)):
+        if(get_sim_time(units="ns") >= float(initial_time + 1000000)):
             return 0,0,0,100
 
     # Wait for first rising edge on bit 0 of uo_out
-    initial_time = get_sim_time(unit="ns")
+    initial_time = get_sim_time(units="ns")
     while dut.uo_out.value == 0:
         await RisingEdge(dut.clk)
-        if(get_sim_time(unit="ns") >= float(initial_time + 1000000)):
+        if(get_sim_time(units="ns") >= float(initial_time + 1000000)):
             return 0,0,0,0
-    rising_edge_time_1 = get_sim_time(unit="ns")
+    rising_edge_time_1 = get_sim_time(units="ns")
 
     # Wait for falling edge on bit 0
     while dut.uo_out.value == 1:
         await RisingEdge(dut.clk)
-    falling_edge_time = get_sim_time(unit="ns")
+    falling_edge_time = get_sim_time(units="ns")
 
     # Wait for second rising edge on bit 0
     while dut.uo_out.value == 0:
         await RisingEdge(dut.clk)
-    rising_edge_time_2 = get_sim_time(unit="ns")
+    rising_edge_time_2 = get_sim_time(units="ns")
 
     period = rising_edge_time_2 - rising_edge_time_1
     frequency = 1e9 / period
@@ -121,7 +121,7 @@ async def test_spi(dut):
     dut._log.info("Start SPI test")
 
     # Set the clock period to 100 ns (10 MHz)
-    clock = Clock(dut.clk, 100, unit="ns")
+    clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -189,7 +189,7 @@ async def test_pwm_freq(dut):
     #    print(name)
 
     # Set the clock period to 100 ns (10 MHz)
-    clock = Clock(dut.clk, 100, unit="ns")
+    clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -244,7 +244,7 @@ async def test_pwm_freq(dut):
 @cocotb.test()
 async def test_pwm_duty(dut):
     # Set the clock period to 100 ns (10 MHz)
-    clock = Clock(dut.clk, 100, unit="ns")
+    clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
