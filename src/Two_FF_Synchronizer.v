@@ -18,10 +18,11 @@ always @(posedge clk or negedge rst_n) begin
     end else begin
         ff1 <= async_in;
         ff2 <= ff1;
+        sync_out <= ff2;
     end
 end
 
-assign sync_out = ff2;
+//assign sync_out = ff2;
 
 endmodule
 
