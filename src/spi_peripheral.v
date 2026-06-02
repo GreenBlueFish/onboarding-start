@@ -26,7 +26,7 @@ reg cross_domain_wire;
 reg sync_out;
 reg ff1_out;
 
-Two_FF_Synchronizer #(.width(1)) tff (
+Two_FF_Synchronizer tff (
     .clk(SCLK),
     .rst_n(rst_n),
     .async_in(cross_domain_wire),
