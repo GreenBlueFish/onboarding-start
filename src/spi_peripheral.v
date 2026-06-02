@@ -41,6 +41,12 @@ Two_FF_Synchronizer #(.width(1)) tff (
 reg [15:0] buffer;
 reg [3:0] counter;
 
+reg [7:0] temp_en_reg_out_7_0;
+reg [7:0] temp_en_reg_out_15_8;
+reg [7:0] temp_en_reg_pwm_7_0;
+reg [7:0] temp_en_reg_pwm_15_8;
+reg [7:0] temp_pwm_duty_cycle;
+
 always @(posedge SCLK) begin
     //If the chip select is on and the rst_n is off
     if((!CS) && (rst_n)) begin
@@ -51,11 +57,11 @@ always @(posedge SCLK) begin
             //Checking if it is a write packet
             if(buffer[12] == 1'b1) begin
                 case(buffer[11:5])
-                    7'h00: en_reg_out_7_0 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
-                    7'h01: en_reg_out_15_8 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
-                    7'h02: en_reg_pwm_7_0 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
-                    7'h03: en_reg_pwm_15_8 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
-                    7'h04: pwm_duty_cycle <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
+                    7'h00: temp_en_reg_out_7_0 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
+                    7'h01: temp_en_reg_out_15_8 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
+                    7'h02: temp_en_reg_pwm_7_0 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
+                    7'h03: temp_en_reg_pwm_15_8 <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
+                    7'h04: temp_pwm_duty_cycle <= {buffer[4:0], sync_out, ff1_out, cross_domain_wire};
                 endcase
             end
             counter <= 4'b0;
@@ -84,6 +90,12 @@ always @(posedge clk or negedge rst_n) begin
     else begin
         //First ff set in clock domain crossing
         cross_domain_wire <= COPI;
+
+        en_reg_out_7_0 <= temp_en_reg_out_7_0;
+        en_reg_out_15_8 <= temp_en_reg_out_15_8;
+        en_reg_pwm_7_0 <= temp_en_reg_pwm_7_0;
+        en_reg_pwm_15_8 <= temp_en_reg_pwm_15_8;
+        pwm_duty_cycle <= temp_pwm_duty_cycle;
     end
 end
 
