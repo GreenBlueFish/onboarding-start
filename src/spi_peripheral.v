@@ -1,13 +1,13 @@
 `default_nettype none
 
 module spi_peripheral (
-    input rst_n,
-    input clk,
+    input wire rst_n,
+    input wire clk,
 
-    input CS,
-    input SCLK,
-    input COPI,
-    output CIPO,
+    input wire CS,
+    input wire SCLK,
+    input wire COPI,
+    output wire CIPO,
 
     output reg [7:0] en_reg_out_7_0,
     output reg [7:0] en_reg_out_15_8,
@@ -15,103 +15,84 @@ module spi_peripheral (
     output reg [7:0] en_reg_pwm_15_8,
     output reg [7:0] pwm_duty_cycle
 );
+    //No CIPO in this design
+    assign CIPO = 1'bz;
 
-//No CIPO in this design
-assign CIPO = 1'bz;
+    //For dealing with peripheral input
+    reg sclk_ff_1, sclk_ff_2;
+    reg copi_ff_1, copi_ff_2;
 
-//For connection between clk ff and SCLK tffs
-reg cross_domain_wire;
+    //For keeping track of how much data has come in
+    reg [3:0] counter;
+    reg activate_counter;
 
-//tffs output
-reg sync_out;
-//reg ff1_out;
-reg past_cross_domain_wire_out;
+    reg [14:0] buffer;
 
-// two ff sychronizer ff code inside always @(posedge SCLK) block
-reg ff1;
-reg ff2;
-assign sync_out = ff2;
+    always @(posedge clk or negedge rst_n) begin
+        //Resetting mechanism
+        if(!rst_n) begin
+            en_reg_out_7_0  <= 8'h0;
+            en_reg_out_15_8 <= 8'h0;
+            en_reg_pwm_7_0  <= 8'h0;
+            en_reg_pwm_15_8 <= 8'h0;
+            pwm_duty_cycle  <= 8'h0;
 
-//SPI is in mode 0
-//CPOL = 0 -> idle state low
-//CPHA = 0 -> sample on first edge
-//Rising edge data sample
-reg [12:0] buffer;
-reg [3:0] counter;
+            sclk_ff_1 <= 1'b0;
+            sclk_ff_2 <= 1'b0;
 
-reg [7:0] temp_en_reg_out_7_0;
-reg [7:0] temp_en_reg_out_15_8;
-reg [7:0] temp_en_reg_pwm_7_0;
-reg [7:0] temp_en_reg_pwm_15_8;
-reg [7:0] temp_pwm_duty_cycle;
+            counter <= 4'b0000;
+            activate_counter <= 1'b1;
 
-always @(posedge SCLK or negedge rst_n) begin
-    if (!rst_n) begin
-        temp_en_reg_out_7_0 <= 8'h0;
-        temp_en_reg_out_15_8 <= 8'h0;
-        temp_en_reg_pwm_7_0 <= 8'h0;
-        temp_en_reg_pwm_15_8 <= 8'h0;
-        temp_pwm_duty_cycle <= 8'h0;
+            buffer <= 15'h0;
 
-        counter <= 4'b0000;
-        buffer <= 13'h0;
-    end
+        end else if(!CS) begin
+            //Feeding sclk through 2 ff's for edge detection
+            sclk_ff_1 <= SCLK;
+            sclk_ff_2 <= sclk_ff_1;
 
-    //If the chip select is on and the rst_n is off
-    else if((!CS) && (rst_n)) begin
-        ff1 <= cross_domain_wire;
-        ff2 <= ff1;
+            //Feeding copi through 2 ff's so copi is in timing with sclk
+            copi_ff_1 <= COPI;
+            copi_ff_2 <= copi_ff_1;
 
-        buffer <= {buffer[11:0], sync_out};
-        past_cross_domain_wire_out <= cross_domain_wire;
-        counter <= counter + 1;
-        
-        if(counter == 4'b1111) begin
-            //Checking if it is a write packet
-            if(buffer[12] == 1'b1) begin
-                case(buffer[11:5])
-                    7'h00: temp_en_reg_out_7_0 <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
-                    7'h01: temp_en_reg_out_15_8 <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
-                    7'h02: temp_en_reg_pwm_7_0 <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
-                    7'h03: temp_en_reg_pwm_15_8 <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
-                    7'h04: temp_pwm_duty_cycle <= {buffer[4:0], sync_out, past_cross_domain_wire_out, cross_domain_wire};
-                    default: ;
-                endcase
+            //Checking if sclk is posedge
+            if((sclk_ff_1 == 0) & (sclk_ff_2 == 1)) begin
+                if(activate_counter == 1) begin
+                    //Adding to counter and preventing continual adding
+                    counter <= counter + 1;
+                    activate_counter <= 1'b0;
+
+                    //Adding data to buffer
+                    buffer <= {buffer[14:0], copi_ff_2};
+                end else ;
             end else ;
-            counter <= 4'b0;
+
+            //I have two design choices with where to put this
+            //if statement, if I put it in the above if block
+            //if would mean 1 additional rising edge would be
+            //needed to update the registers, as I don't belive
+            //this is going to always happen I chose to put the
+            //if statement outside of this statment but this
+            //means that if any other module wants to update
+            //the reg's it could very quickly be over rided.
+            //Since no other module uses these reg's I will put
+            //the if statement below the above one
+            if(counter == 4'b1111) begin
+                if(buffer[14] == 1'b1) begin
+                    case(buffer[13:7])
+                        7'h0: en_reg_out_7_0  <= {buffer[6:0],copi_ff_2};
+                        7'h1: en_reg_out_15_8 <= {buffer[6:0],copi_ff_2};
+                        7'h2: en_reg_pwm_7_0  <= {buffer[6:0],copi_ff_2};
+                        7'h3: en_reg_pwm_15_8 <= {buffer[6:0],copi_ff_2};
+                        7'h4: pwm_duty_cycle <= {buffer[6:0],copi_ff_2};
+                        default: ;
+                    endcase
+                end
+            end
+
+            //Checking if sclk is negedge
+            if ((sclk_ff_1 == 1) & (sclk_ff_2 == 0)) begin
+                activate_counter <= 1'b1;
+            end
         end
     end
-
-     //If CS is 1 or High Z
-     if (CS) begin
-        counter <= 4'b0000;
-
-        ff1 <= cross_domain_wire;
-        ff2 <= ff1;
-    end
-end
-
-always @(posedge clk or negedge rst_n) begin
-    //Reset mechanism
-    if(!rst_n) begin
-        cross_domain_wire <= 1'b0;
-
-        en_reg_out_7_0 <= 8'h0;
-        en_reg_out_15_8 <= 8'h0;
-        en_reg_pwm_7_0 <= 8'h0;
-        en_reg_pwm_15_8 <= 8'h0;
-        pwm_duty_cycle <= 8'h0;
-    end
-    else begin
-        //First ff set in clock domain crossing
-        cross_domain_wire <= COPI;
-
-        en_reg_out_7_0 <= temp_en_reg_out_7_0;
-        en_reg_out_15_8 <= temp_en_reg_out_15_8;
-        en_reg_pwm_7_0 <= temp_en_reg_pwm_7_0;
-        en_reg_pwm_15_8 <= temp_en_reg_pwm_15_8;
-        pwm_duty_cycle <= temp_pwm_duty_cycle;
-    end
-end
-
 endmodule
