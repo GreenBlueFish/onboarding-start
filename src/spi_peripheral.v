@@ -62,7 +62,7 @@ module spi_peripheral (
                     activate_counter <= 1'b0;
 
                     //Adding data to buffer
-                    buffer <= {buffer[14:0], copi_ff_2};
+                    buffer <= {buffer[13:0], copi_ff_2};
                 end else ;
             end else ;
 
