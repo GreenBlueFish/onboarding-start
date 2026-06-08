@@ -222,22 +222,26 @@ async def test_pwm_freq(dut):
     # testing a few different duty cycles to see if changes the frequency (I know the duty cycle has no influence over the frequency but I may as well make the test)
 
     # duty cycle = 10
-    period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
-    assert 2970 <= frequency <= 3030
+    for i in range(10):
+        period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
+        assert 2970 <= frequency <= 3030
+        await ClockCycles(dut.clk, 10)
 
     # duty cycle = 50
     ui_in_val = await send_spi_transaction(dut, 1, 0x04, 0x80)
     await ClockCycles(dut.clk, 100)
-
-    period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
-    assert 2970 <= frequency <= 3030
+    for i in range(10):
+        period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
+        assert 2970 <= frequency <= 3030
+        await ClockCycles(dut.clk, 10)
 
     # duty cycle = 90
     ui_in_val = await send_spi_transaction(dut, 1, 0x04, 0xE7)
     await ClockCycles(dut.clk, 100)
-
-    period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
-    assert 2970 <= frequency <= 3030
+    for i in range(10):
+        period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
+        assert 2970 <= frequency <= 3030
+        await ClockCycles(dut.clk, 10)
 
     dut._log.info("PWM Frequency test completed successfully")
 
@@ -275,21 +279,25 @@ async def test_pwm_duty(dut):
     await ClockCycles(dut.clk, 100)
 
     # duty cycle = 0
-    period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
-    assert duty_cycle == 0, "expected 0"
+    for i in range(10):
+        period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
+        assert duty_cycle == 0, "expected 0"
+        await ClockCycles(dut.clk, 10)
 
     # duty cycle = 50
     ui_in_val = await send_spi_transaction(dut, 1, 0x04, 0x80)
     await ClockCycles(dut.clk, 100)
-
-    period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
-    assert duty_cycle == 50, "expected 50"
+    for i in range(10):
+        period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
+        assert duty_cycle == 50, "expected 50"
+        await ClockCycles(dut.clk, 10)
 
     # duty cylce = 100
     ui_in_val = await send_spi_transaction(dut, 1, 0x04, 0xFF)
     await ClockCycles(dut.clk, 100)
-
-    period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
-    assert duty_cycle == 100, "expected 100"
+    for i in range(10):
+        period, frequency, high_time, duty_cycle = await pwm_signal_info(dut)
+        assert duty_cycle == 100, "expected 100"
+        await ClockCycles(dut.clk, 10)
 
     dut._log.info("PWM Duty Cycle test completed successfully")
